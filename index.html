@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Diego Alejandro Rivera Hernandez</h1>
+    <h2>Driverah3</h2>
+    <p><a href="https://github.com/Driverah3?tab=repositories">Driverah3</a></p>
+    <title>Formulario Simple</title>
+</head>
+<body>
+    <h1>Formulario</h1>
+
+    <!-- FORMULARIO -->
+    <form id="miFormulario">
+        <label>Nombres:</label><br>
+        <input type="text" id="nombres"><br><br>
+
+        <label>Apellidos:</label><br>
+        <input type="text" id="apellidos"><br><br>
+
+        <label>Año de nacimiento:</label><br>
+        <input type="number" id="anio"><br><br>
+
+        <label>Fecha de nacimiento:</label><br>
+        <input type="date" id="fecha"><br><br>
+
+        <button type="submit">Enviar</button>
+    </form>
+
+    <!-- RESULTADO -->
+    <p id="mensaje"></p>
+
+    <script>
+        // Verificar si un año es bisiesto
+        function esBisiesto(anio) {
+            if ((anio % 4 === 0 && anio % 100 !== 0) || (anio % 400 === 0)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // Verificar si el año es par
+        function esPar(anio) {
+            return anio % 2 === 0;
+        }
+
+        // Crear o abrir la base de datos
+        let db;
+        let pedido = indexedDB.open("MiBaseDeDatos", 1);
+
+        pedido.onupgradeneeded = function(evento) {
+            db = evento.target.result;
+            db.createObjectStore("personas", { keyPath: "id", autoIncrement: true });
+        };
+
+        pedido.onsuccess = function(evento) {
+            db = evento.target.result;
+        };
+
+        // Evento cuando se envía el formulario
+        document.getElementById("miFormulario").addEventListener("submit", function(evento) {
+            evento.preventDefault();
+            let nombres = document.getElementById("nombres").value;
+            let apellidos = document.getElementById("apellidos").value;
+            let anio = parseInt(document.getElementById("anio").value);
+            let fecha = document.getElementById("fecha").value;
+            // Revisar si es bisiesto y par
+            let mensaje = "El año " + anio;
+            mensaje += esBisiesto(anio) ? " es bisiesto" : " no es bisiesto";
+            mensaje += " y es " + (esPar(anio) ? "par." : "impar.");
+
+            // Mostrar mensaje en la página
+            document.getElementById("mensaje").innerText = mensaje;
+
+            // Guardar en IndexedDB
+            let transaccion = db.transaction(["personas"], "readwrite");
+            let personas = transaccion.objectStore("personas");
+
+            let datos = {
+                nombres: nombres,
+                apellidos: apellidos,
+                anio: anio,
+                fecha: fecha
+            };
+
+            personas.add(datos);
+        });
+    </script>
+</body>
+</html>
+</body>
+</html>
